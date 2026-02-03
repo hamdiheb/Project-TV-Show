@@ -3,6 +3,18 @@ function setup() {
   const allEpisodes = getAllEpisodes();
   document.body.setAttribute("style","background-color: #EDEDED;")
   makePageForEpisodes(allEpisodes);
+
+  const searchInput = document.querySelector("#search");
+  const searchButton = document.querySelector("#search-btn");
+  let filteredMovies = [];
+
+  searchButton.addEventListener("click", () => {
+   filteredMovies = allEpisodes.filter(element => element.name == searchInput.value)
+   rootElem.innerHTML = `      <label>
+        <input type="text" id="search"/><button id="search-btn">search</button>
+      </label>`;
+   makePageForEpisodes(filteredMovies);
+  })
 }
 
 function makePageForEpisodes(episodeList) {
@@ -33,7 +45,7 @@ function makePageForEpisodes(episodeList) {
 
 
   // Second Option with function and destructing
-  const rootElem = document.getElementById("root");
+  // const rootElem = document.getElementById("root");
   const sectionMovies = document.createElement("section");
   rootElem.append(sectionMovies);
   const component = displayMovies(episodeList,sectionMovies);
@@ -64,6 +76,7 @@ function movieComponent(name,season,number,summary, medium){
   return componentStyle(movie);
 }
 
+
 function sectionStyle(section){
   section.setAttribute("style","display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center;")
   return section;
@@ -89,4 +102,5 @@ function summaryStyle(summary){
   return summary;
 }
 
+  const rootElem = document.getElementById("root");
 window.onload = setup;
