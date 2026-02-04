@@ -6,14 +6,20 @@ function setup() {
 
   const searchInput = document.querySelector("#search");
   const searchButton = document.querySelector("#search-btn");
+  const moviespanCounter = document.querySelector("#movie-counter");
   let filteredMovies = [];
-
+  let movieCounter =0;
   searchButton.addEventListener("click", () => {
-   filteredMovies = allEpisodes.filter(element => {if(element.name.includes(searchInput.value)) return element})
-   rootElem.innerHTML = `      <label>
-        <input type="text" id="search"/><button id="search-btn">search</button>
-      </label>`;
-   makePageForEpisodes(filteredMovies);
+   rootElem.innerHTML = `<div id="root"></div>`
+   filteredMovies = allEpisodes.filter(element => {
+    if(element.name.toUpperCase().includes(searchInput.value.toUpperCase())){
+      movieCounter++;
+      return element
+    }
+  })
+  moviespanCounter.innerText = `${movieCounter} movie from ${allEpisodes.length} movies`;
+  makePageForEpisodes(filteredMovies);
+  movieCounter=0;
   })
 }
 
@@ -102,5 +108,5 @@ function summaryStyle(summary){
   return summary;
 }
 
-  const rootElem = document.getElementById("root");
+const rootElem = document.getElementById("root");
 window.onload = setup;
