@@ -17,7 +17,7 @@ function setup() {
       return element
     }
   })
-  moviespanCounter.innerText = `${movieCounter} movie from ${allEpisodes.length} movies`;
+  moviespanCounter.innerText = `Displaying ${movieCounter}/${allEpisodes.length} episodes`;
   makePageForEpisodes(filteredMovies);
   movieCounter=0;
   })
