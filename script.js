@@ -6,17 +6,16 @@ function setup() {
 }
 
 function makePageForEpisodes(episodeList) {
-  const sectionMovies = document.createElement("section");
-  rootElem.append(sectionMovies);
-  const component = displayMovies(episodeList,sectionMovies);
-  for(const element in component){
-    sectionMovies.append(component[element]);
+  const rootElem = document.getElementById("root");
+  const component = displayMovies(episodeList,rootElem);
+  for(const element of component){
+    rootElem.append(element);
   }
-  sectionStyle(sectionMovies);
+  sectionStyle(rootElem);
 }
 
-function displayMovies(allEpisodes){
-  return allEpisodes.map(element => {
+function displayMovies(Episodes){
+  return Episodes.map(element => {
     const {name, season, number, summary}=element;
     const {medium} = element.image
     return movieComponent(name,season,number,summary, medium);
