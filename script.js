@@ -4,13 +4,36 @@ function setup() {
   bodyStyle(document.body);
   makePageForEpisodes(allEpisodes);
   setupSearch(allEpisodes);
+  setupSelectListener(allEpisodes);
 }
+function setupSelect(episodeName, season, number) {
+  const sel = document.querySelector("#episode-selector");
+  const opt = document.createElement("option");
+  opt.value = episodeName;
+  opt.innerText = `${episodeName} - S${padTo2Digits(season)}E${padTo2Digits(number)}`;
+  sel.append(opt);
+}
+function setupSelectListener(allEpisodes) {
+  const select = document.getElementById("episode-selector");
+  select.addEventListener('change', (event) => {
+    const selectedEpisode = event.target.value;
+    displayCleaning();
+    if (selectedEpisode === "all-episodes") {
+      makePageForEpisodes(allEpisodes);
+      return;
+    }
+    const filteredEpisodes = filterEpisodes(allEpisodes, selectedEpisode);
+    const component = displayMovies(filteredEpisodes, rootElem);
+      rootElem.append(component[0]);
+  });
+}
+
+
 function setupSearch(allEpisodes) {
   const searchInput = document.getElementById("search-input");
   searchInput.addEventListener('keyup', (event) => {
     const filteredEpisodes = filterEpisodes(allEpisodes, event.target.value);
-    const rootElem = document.getElementById("root");
-    rootElem.innerHTML = "";
+    displayCleaning();
     const component = displayMovies(filteredEpisodes, rootElem);
     for (const element of component) {
       rootElem.append(element);
@@ -43,10 +66,15 @@ function makePageForEpisodes(episodeList) {
 
 function displayMovies(Episodes){
   return Episodes.map(element => {
-    const {name, season, number, summary}=element;
-    const {medium} = element.image
+    const { name, season, number, summary } = element;
+    const { medium } = element.image;
+    setupSelect(name, season, number);
     return movieComponent(name,season,number,summary, medium);
   })
+}
+function displayCleaning() {
+  const rootElem = document.getElementById("root");
+  rootElem.innerHTML = "";
 }
 
 function movieComponent(name,season,number,summary, medium){
