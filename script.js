@@ -9,7 +9,7 @@ function setup() {
   let filteredMovies = [];
 
   searchButton.addEventListener("click", () => {
-   filteredMovies = allEpisodes.filter(element => element.name == searchInput.value)
+   filteredMovies = allEpisodes.filter(element => {if(element.name.includes(searchInput.value)) return element})
    rootElem.innerHTML = `      <label>
         <input type="text" id="search"/><button id="search-btn">search</button>
       </label>`;
