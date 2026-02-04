@@ -3,6 +3,33 @@ function setup() {
   const allEpisodes = getAllEpisodes();
   bodyStyle(document.body);
   makePageForEpisodes(allEpisodes);
+  setupSearch(allEpisodes);
+}
+function setupSearch(allEpisodes) {
+  const searchInput = document.getElementById("search-input");
+  searchInput.addEventListener('keyup', (event) => {
+    const filteredEpisodes = filterEpisodes(allEpisodes, event.target.value);
+    const rootElem = document.getElementById("root");
+    rootElem.innerHTML = "";
+    const component = displayMovies(filteredEpisodes, rootElem);
+    for (const element of component) {
+      rootElem.append(element);
+    }
+    const resultCount = document.getElementById("result-count");
+    if (resultCount) {
+      resultCount.innerText = `Displaying ${filteredEpisodes.length} / ${allEpisodes.length} episodes`;
+
+    }
+  });
+}
+function filterEpisodes(allEpisodes, searchText) {
+  return allEpisodes.filter(episode => {
+    const { name, summary } = episode;
+    const episodeName = name.toLowerCase();
+    const episodeSummary = summary.toLowerCase();
+    const searchTextLower = searchText.toLowerCase()
+    return episodeName.includes(searchTextLower) || episodeSummary.includes(searchTextLower);
+  })
 }
 
 function makePageForEpisodes(episodeList) {
