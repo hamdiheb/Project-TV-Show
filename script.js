@@ -1,26 +1,8 @@
 //You can edit ALL of the code here
 function setup() {
   const allEpisodes = getAllEpisodes();
-  document.body.setAttribute("style","background-color: #EDEDED;")
+  bodyStyle(document.body);
   makePageForEpisodes(allEpisodes);
-
-  const searchInput = document.querySelector("#search");
-  const searchButton = document.querySelector("#search-btn");
-  const moviespanCounter = document.querySelector("#movie-counter");
-  let filteredMovies = [];
-  let movieCounter =0;
-  searchButton.addEventListener("click", () => {
-   rootElem.innerHTML = `<div id="root"></div>`
-   filteredMovies = allEpisodes.filter(element => {
-    if(element.name.toUpperCase().includes(searchInput.value.toUpperCase()) || element.summary.toUpperCase().includes(searchInput.value.toUpperCase())){
-      movieCounter++;
-      return element
-    }
-  })
-  moviespanCounter.innerText = `Displaying ${movieCounter}/${allEpisodes.length} episodes`;
-  makePageForEpisodes(filteredMovies);
-  movieCounter=0;
-  })
 }
 
 function makePageForEpisodes(episodeList) {
@@ -47,13 +29,21 @@ function movieComponent(name,season,number,summary, medium){
   const movieSummary = document.createElement("p");
   const movieImage = document.createElement("img");
   
-  title.innerText = `${name} - S${season.toString().padStart(2,'0')}E${number.toString().padStart(2,'0')}`;
+  title.innerText = `${name} - S${padTo2Digits(season)}E${padTo2Digits(number)}`;
   movieSummary.innerHTML = summary;
   movieImage.src = medium;
   movie.append(titleStyle(title),imageStyle(movieImage),summaryStyle(movieSummary));
   return componentStyle(movie);
 }
 
+function padTo2Digits(num) {
+  return num.toString().padStart(2, '0');
+}
+
+function bodyStyle(body) {
+  body.setAttribute("style", "background-color: #EDEDED;")
+  return body;
+}
 
 function sectionStyle(section){
   section.setAttribute("style","display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center;")
