@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -9,12 +9,28 @@
   </head>
 
   <body>
-    <label>
-        <input type="text" id="search"/><button id="search-btn">search</button><span id="movie-counter">Displaying 73/73 episodes</span>
-    </label>
-    <div id="root">
+    <header class="header">
+      <h1>TV Show Project</h1>
+      <div class="episode-div" id="episode-div">
+        <select id="episode-selector">
+          <option value="all-episodes">All Episodes</option>
+        </select>
+        <label>
+          Search
+          <input
+            type="search"
+            id="search-input"
+            name="search-input"
+            placeholder="Search term"
+          />
+          🔍
+        </label>
+        <div id="result-count"></div>
+      </div>
+    </header>
+    <section id="root"></section>
 
-    </div>
+    <div id="root"></div>
 
     <!-- Loads a provided function called getAllEpisodes() which returns all episodes -->
     <script src="episodes.js"></script>

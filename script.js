@@ -1,44 +1,80 @@
 //You can edit ALL of the code here
 function setup() {
   const allEpisodes = getAllEpisodes();
-  document.body.setAttribute("style","background-color: #EDEDED;")
+  bodyStyle(document.body);
   makePageForEpisodes(allEpisodes);
-
-  const searchInput = document.querySelector("#search");
-  const searchButton = document.querySelector("#search-btn");
-  const moviespanCounter = document.querySelector("#movie-counter");
-  let filteredMovies = [];
-  let movieCounter =0;
-  searchButton.addEventListener("click", () => {
-   rootElem.innerHTML = `<div id="root"></div>`
-   filteredMovies = allEpisodes.filter(element => {
-    if(element.name.toUpperCase().includes(searchInput.value.toUpperCase()) || element.summary.toUpperCase().includes(searchInput.value.toUpperCase())){
-      movieCounter++;
-      return element
+  setupSearch(allEpisodes);
+  setupSelectListener(allEpisodes);
+}
+function setupSelect(episodeName, season, number) {
+  const sel = document.querySelector("#episode-selector");
+  const opt = document.createElement("option");
+  opt.value = episodeName;
+  opt.innerText = `${episodeName} - S${padTo2Digits(season)}E${padTo2Digits(number)}`;
+  sel.append(opt);
+}
+function setupSelectListener(allEpisodes) {
+  const select = document.getElementById("episode-selector");
+  select.addEventListener('change', (event) => {
+    const selectedEpisode = event.target.value;
+    displayCleaning();
+    if (selectedEpisode === "all-episodes") {
+      makePageForEpisodes(allEpisodes);
+      return;
     }
-  })
-  moviespanCounter.innerText = `Displaying ${movieCounter}/${allEpisodes.length} episodes`;
-  makePageForEpisodes(filteredMovies);
-  movieCounter=0;
+    const filteredEpisodes = filterEpisodes(allEpisodes, selectedEpisode);
+    const component = displayMovies(filteredEpisodes, rootElem);
+      rootElem.append(component[0]);
+  });
+}
+
+
+function setupSearch(allEpisodes) {
+  const searchInput = document.getElementById("search-input");
+  searchInput.addEventListener('keyup', (event) => {
+    const filteredEpisodes = filterEpisodes(allEpisodes, event.target.value);
+    displayCleaning();
+    const component = displayMovies(filteredEpisodes, rootElem);
+    for (const element of component) {
+      rootElem.append(element);
+    }
+    const resultCount = document.getElementById("result-count");
+    if (resultCount) {
+      resultCount.innerText = `Displaying ${filteredEpisodes.length} / ${allEpisodes.length} episodes`;
+
+    }
+  });
+}
+function filterEpisodes(allEpisodes, searchText) {
+  return allEpisodes.filter(episode => {
+    const { name, summary } = episode;
+    const episodeName = name.toLowerCase();
+    const episodeSummary = summary.toLowerCase();
+    const searchTextLower = searchText.toLowerCase()
+    return episodeName.includes(searchTextLower) || episodeSummary.includes(searchTextLower);
   })
 }
 
 function makePageForEpisodes(episodeList) {
-  const sectionMovies = document.createElement("section");
-  rootElem.append(sectionMovies);
-  const component = displayMovies(episodeList,sectionMovies);
-  for(const element in component){
-    sectionMovies.append(component[element]);
+  const rootElem = document.getElementById("root");
+  const component = displayMovies(episodeList,rootElem);
+  for(const element of component){
+    rootElem.append(element);
   }
-  sectionStyle(sectionMovies);
+  sectionStyle(rootElem);
 }
 
-function displayMovies(allEpisodes){
-  return allEpisodes.map(element => {
-    const {name, season, number, summary}=element;
-    const {medium} = element.image
+function displayMovies(Episodes){
+  return Episodes.map(element => {
+    const { name, season, number, summary } = element;
+    const { medium } = element.image;
+    setupSelect(name, season, number);
     return movieComponent(name,season,number,summary, medium);
   })
+}
+function displayCleaning() {
+  const rootElem = document.getElementById("root");
+  rootElem.innerHTML = "";
 }
 
 function movieComponent(name,season,number,summary, medium){
@@ -47,13 +83,21 @@ function movieComponent(name,season,number,summary, medium){
   const movieSummary = document.createElement("p");
   const movieImage = document.createElement("img");
   
-  title.innerText = `${name} - S${season.toString().padStart(2,'0')}E${number.toString().padStart(2,'0')}`;
+  title.innerText = `${name} - S${padTo2Digits(season)}E${padTo2Digits(number)}`;
   movieSummary.innerHTML = summary;
   movieImage.src = medium;
   movie.append(titleStyle(title),imageStyle(movieImage),summaryStyle(movieSummary));
   return componentStyle(movie);
 }
 
+function padTo2Digits(num) {
+  return num.toString().padStart(2, '0');
+}
+
+function bodyStyle(body) {
+  body.setAttribute("style", "background-color: #EDEDED;")
+  return body;
+}
 
 function sectionStyle(section){
   section.setAttribute("style","display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center;")

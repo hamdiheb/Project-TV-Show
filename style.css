@@ -1,3 +1,12 @@
 #root {
   color: red;
 }
+
+header {
+  text-align: center;
+}
+
+.episode-div {
+  display: flex;
+  justify-content: center;
+}
