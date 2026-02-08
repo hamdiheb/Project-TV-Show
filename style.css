@@ -1,12 +1,64 @@
-#root {
-  color: red;
+body{
+   background-image: url("https://images.alphacoders.com/502/thumb-1920-502329.jpg");
+   background-repeat: no-repeat;
+   background-size: cover;
+   color: white;
+   padding: 5px 10px;
 }
 
-header {
-  text-align: center;
+.search-component{
+    display: flex;
+    justify-content: space-between;
 }
 
-.episode-div {
-  display: flex;
-  justify-content: center;
+.search-option {
+    background: rgba(248, 253, 248, 0.1)  ; /*  10% opaque green */ 
+    padding: 20px;
+    color: white;
+}
+
+.episodes-display {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.episode-component {
+    border: 1px solid white;
+    width: 20%;
+    margin: 20px;
+}
+
+.episode-component:hover{
+    width: 25%;
+    transition: 500ms;
+}
+
+.episode-nb-sn {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 10px;
+    padding: 10px;
+}
+
+.episode-img {
+    width: 100%;
+}
+
+.episode-duration-rate {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    margin: 10px 10px;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.margin {
+    margin: 10px;
+}
+
+.season-select-option {
+    
+    background: transparent;
+    color: black;
 }

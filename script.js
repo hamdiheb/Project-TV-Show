@@ -1,128 +1,67 @@
-//You can edit ALL of the code here
-function setup() {
-  const allEpisodes = getAllEpisodes();
-  bodyStyle(document.body);
-  makePageForEpisodes(allEpisodes);
-  setupSearch(allEpisodes);
-  setupSelectListener(allEpisodes);
-}
-function setupSelect(episodeName, season, number) {
-  const sel = document.querySelector("#episode-selector");
-  const opt = document.createElement("option");
-  opt.value = episodeName;
-  opt.innerText = `${episodeName} - S${padTo2Digits(season)}E${padTo2Digits(number)}`;
-  sel.append(opt);
-}
-function setupSelectListener(allEpisodes) {
-  const select = document.getElementById("episode-selector");
-  select.addEventListener('change', (event) => {
-    const selectedEpisode = event.target.value;
-    displayCleaning();
-    if (selectedEpisode === "all-episodes") {
-      makePageForEpisodes(allEpisodes);
-      return;
-    }
-    const filteredEpisodes = filterEpisodes(allEpisodes, selectedEpisode);
-    const component = displayMovies(filteredEpisodes, rootElem);
-      rootElem.append(component[0]);
-  });
+function render(){
+    const allEpisodes = getAllEpisodes();
+    function renderAll(){
+        allEpisodes.map(element => {
+        document.querySelector(".episodes-display").append(episodeComponent(element));
+    })};
+    
+    renderAll();
+
+    const inputSearch = document.querySelector("#search-input");
+    inputSearch.addEventListener("keyup", () =>{
+        filterEpisodes(inputSearch.value);
+    }); 
+
+    const select = document.querySelector("select");
+    episodesList = allEpisodes.map(element => {
+        const optionClone = document.querySelector(".season-select-option").cloneNode(true);
+        optionClone.innerText = `${element.name}`;
+        select.append(optionClone);
+    });
+
+    select.addEventListener("change", (event) => {
+        const selectedOption = event.target.value;
+        selectedOption!='All Seasons' ? filterEpisodes(selectedOption) : renderAll();
+    });
 }
 
-
-function setupSearch(allEpisodes) {
-  const searchInput = document.getElementById("search-input");
-  searchInput.addEventListener('keyup', (event) => {
-    const filteredEpisodes = filterEpisodes(allEpisodes, event.target.value);
-    displayCleaning();
-    const component = displayMovies(filteredEpisodes, rootElem);
-    for (const element of component) {
-      rootElem.append(element);
-    }
-    const resultCount = document.getElementById("result-count");
-    if (resultCount) {
-      resultCount.innerText = `Displaying ${filteredEpisodes.length} / ${allEpisodes.length} episodes`;
-
-    }
-  });
-}
-function filterEpisodes(allEpisodes, searchText) {
-  return allEpisodes.filter(episode => {
-    const { name, summary } = episode;
-    const episodeName = name.toLowerCase();
-    const episodeSummary = summary.toLowerCase();
-    const searchTextLower = searchText.toLowerCase()
-    return episodeName.includes(searchTextLower) || episodeSummary.includes(searchTextLower);
-  })
+function episodeComponent(element){
+    const {name, season, number, summary} = element;
+    const {medium} = element.image;
+    const componentCloned = document.querySelector("template").cloneNode(true);
+    componentCloned.content.querySelector("h5").innerText = `S${season.toString().padStart(2,'0')}E${number.toString().padStart(2,'0')}`;
+    componentCloned.content.querySelector("img").src = medium;
+    componentCloned.content.querySelector("h3").innerText = `${name}`;
+    componentCloned.content.querySelector("p").innerHtml = summary;
+    const newArticle = document.createElement("div");
+    newArticle.classList.add("episode-component");
+    newArticle.append(componentCloned.content);
+    return newArticle;
 }
 
-function makePageForEpisodes(episodeList) {
-  const rootElem = document.getElementById("root");
-  const component = displayMovies(episodeList,rootElem);
-  for(const element of component){
-    rootElem.append(element);
-  }
-  sectionStyle(rootElem);
+function filterEpisodes(input){
+    document.querySelector(".episodes-display").innerHTML = `
+                    <template class="episode-component">
+                    <h5 class="episode-nb-sn">S01E01</h5>
+                    <img class="episode-img" src="http://static.tvmaze.com/uploads/images/medium_landscape/1/2668.jpg" alt="episode-image"/>
+                    <h3 class="episode-title margin">Winter is Coming</h3>
+                    <p class="episode-summary margin">Lord Eddard Stark, ruler of the North, is summoned to court by his old friend, King Robert Baratheon, to serve as the King's Hand. Eddard reluctantly agrees after learning of a possible threat to the King's life. Eddard's bastard son Jon Snow must make a painful decision about his own future, while in the distant east Viserys Targaryen plots to reclaim his father's throne, usurped by Robert, by selling his sister in marriage.</p>
+                    <div class="episode-duration-rate">
+                        <p>62 min</p>
+                        <p>8.91</p>
+                    </div>
+                </template>
+    `;
+    const allEpisodes = getAllEpisodes();
+    let count =0;
+    allEpisodes.filter(element => {
+        if((element.name.toUpperCase().includes(input.toUpperCase())) || (element.summary.toUpperCase().includes(input.toUpperCase()))){
+            const newcomponent = episodeComponent(element);
+            document.querySelector(".episodes-display").append(newcomponent);
+            count++;
+            document.querySelector(".episode-numbers") .innerText = `Displaying ${count}/73`;
+        }
+    });
 }
 
-function displayMovies(Episodes){
-  return Episodes.map(element => {
-    const { name, season, number, summary } = element;
-    const { medium } = element.image;
-    setupSelect(name, season, number);
-    return movieComponent(name,season,number,summary, medium);
-  })
-}
-function displayCleaning() {
-  const rootElem = document.getElementById("root");
-  rootElem.innerHTML = "";
-}
-
-function movieComponent(name,season,number,summary, medium){
-  const movie = document.createElement("article");
-  const title = document.createElement("h3");
-  const movieSummary = document.createElement("p");
-  const movieImage = document.createElement("img");
-  
-  title.innerText = `${name} - S${padTo2Digits(season)}E${padTo2Digits(number)}`;
-  movieSummary.innerHTML = summary;
-  movieImage.src = medium;
-  movie.append(titleStyle(title),imageStyle(movieImage),summaryStyle(movieSummary));
-  return componentStyle(movie);
-}
-
-function padTo2Digits(num) {
-  return num.toString().padStart(2, '0');
-}
-
-function bodyStyle(body) {
-  body.setAttribute("style", "background-color: #EDEDED;")
-  return body;
-}
-
-function sectionStyle(section){
-  section.setAttribute("style","display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center;")
-  return section;
-}
-
-function componentStyle(movie){
-  movie.setAttribute("style","width: 100%; max-width: 25%; color: black; background-color: #FFF; margin: 10px 20px;border-radius: 20px;")
-  return movie;
-}
-
-function titleStyle(title){
-  title.setAttribute("style","border: 1px solid black; padding: 20px 10px;margin-top: -3px;border-top-left-radius: 20px;border-top-right-radius: 20px;")
-  return title;
-}
-
-function imageStyle(image){
-  image.setAttribute("style","width: 100%");
-  return image;
-}
-
-function summaryStyle(summary){
-  summary.setAttribute("style","width: 100; text-align: left; padding: 0 10px");
-  return summary;
-}
-
-const rootElem = document.getElementById("root");
-window.onload = setup;
+render();
