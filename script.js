@@ -1,5 +1,4 @@
-function render(){
-    const allEpisodes = getAllEpisodes();
+function render(allEpisodes){
     function renderAll(){
         allEpisodes.map(element => {
         document.querySelector(".episodes-display").append(episodeComponent(element));
@@ -9,11 +8,11 @@ function render(){
 
     const inputSearch = document.querySelector("#search-input");
     inputSearch.addEventListener("keyup", () =>{
-        filterEpisodes(inputSearch.value);
+        filterEpisodes(allEpisodes,inputSearch.value);
     }); 
 
     const select = document.querySelector("select");
-    episodesList = allEpisodes.map(element => {
+    const episodesList = allEpisodes.map(element => {
         const optionClone = document.querySelector(".season-select-option").cloneNode(true);
         optionClone.innerText = `${element.name}`;
         select.append(optionClone);
@@ -21,7 +20,7 @@ function render(){
 
     select.addEventListener("change", (event) => {
         const selectedOption = event.target.value;
-        selectedOption!='All Seasons' ? filterEpisodes(selectedOption) : renderAll();
+        selectedOption!='All Seasons' ? filterEpisodes(allEpisodes,selectedOption) : renderAll();
     });
 }
 
@@ -39,7 +38,7 @@ function episodeComponent(element){
     return newArticle;
 }
 
-function filterEpisodes(input){
+function filterEpisodes(allEpisodes,input){
     document.querySelector(".episodes-display").innerHTML = `
                     <template class="episode-component">
                     <h5 class="episode-nb-sn">S01E01</h5>
@@ -52,7 +51,6 @@ function filterEpisodes(input){
                     </div>
                 </template>
     `;
-    const allEpisodes = getAllEpisodes();
     let count =0;
     allEpisodes.filter(element => {
         if((element.name.toUpperCase().includes(input.toUpperCase())) || (element.summary.toUpperCase().includes(input.toUpperCase()))){
@@ -64,4 +62,15 @@ function filterEpisodes(input){
     });
 }
 
-render();
+async function fetchData(){
+    const res = await fetch("https://api.tvmaze.com/shows/82/episodes")
+    const data = await res.json();
+    return data;
+}
+
+async function main(){
+    const allEpisodes=await fetchData();
+    render(allEpisodes);
+}
+
+main();
