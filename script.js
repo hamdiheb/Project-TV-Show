@@ -20,7 +20,7 @@ function render(allEpisodes){
 
     select.addEventListener("change", (event) => {
         const selectedOption = event.target.value;
-        selectedOption!='All Seasons' ? filterEpisodes(allEpisodes,selectedOption) : renderAll();
+        selectedOption!='All Episodes' ? filterEpisodes(allEpisodes,selectedOption) : renderAll();
     });
 }
 
@@ -62,14 +62,21 @@ function filterEpisodes(allEpisodes,input){
     });
 }
 
-async function fetchData(){
-    const res = await fetch("https://api.tvmaze.com/shows/82/episodes")
-    const data = await res.json();
-    return data;
+async function apiFetch(){
+    const render = document.querySelector(".rendering");
+    const res = await fetch("https://api.tvmaze.com/shows/22/episodes");
+    if(res.ok){
+        const data = await res.json();
+        render.remove()
+        return data;
+    }else{
+        alert("API data couldn't be rendered Error");
+        render.innerText = `API data couldn't be rendered Error ${res.status}`;
+    }
 }
 
 async function main(){
-    const allEpisodes=await fetchData();
+    const allEpisodes=await apiFetch();
     render(allEpisodes);
 }
 
