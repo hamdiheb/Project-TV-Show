@@ -12,7 +12,7 @@
           <p class="episode-numbers">Displaying 73/73 episodes</p>
         </div>
         <div class="episodes-search-options">
-          <select class="search-option" id="select-season">
+          <select id="select-season" class="search-option">
             <option class="season-select-option">All Episodes</option>
           </select>
           <label>
@@ -23,8 +23,12 @@
               id="search-input"
             />
           </label>
-          <select class="search-option">
+          <select class="search-option hidden">
             <option>Sort by <span>Newest</span></option>
+          </select>
+          <select id="search-show" class="search-option">
+            <option>All shows</option>
+            <!-- <span>Newest</span> -->
           </select>
         </div>
       </article>

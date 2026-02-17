@@ -1,5 +1,11 @@
-    function renderAll(allEpisodes){
-            allEpisodes.map(element => {
+import { getEpisodes } from "./api.js"
+
+async function main() {
+  const allEpisodes = await getEpisodes(22);
+  render(allEpisodes);
+}
+function renderAll(allEpisodes) {
+  allEpisodes.map(element => {
             document.querySelector(".episodes-display").append(episodeComponent(element));
             })
     };
@@ -71,22 +77,4 @@
         });
     }
 
-    async function apiFetch(){
-        const render = document.querySelector(".rendering");
-        const res = await fetch("https://api.tvmaze.com/shows/22/episodes");
-        if(res.ok){
-            const data = await res.json();
-            render.remove()
-            return data;
-        }else{
-            alert("API data couldn't be rendered Error");
-            render.innerText = `API data couldn't be rendered Error ${res.status}`;
-        }
-    }
-
-    async function main(){
-        const allEpisodes=await apiFetch();
-        render(allEpisodes);
-    }
-
-    main();
+main();

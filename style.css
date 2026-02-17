@@ -12,7 +12,7 @@ body{
 }
 
 .search-option {
-    background: rgba(248, 253, 248, 0.1)  ; /*  10% opaque green */ 
+    background: rgba(248, 253, 248, 0.1);
     padding: 20px;
     color: white;
 }
@@ -30,8 +30,12 @@ body{
 }
 
 .episode-component:hover{
-    width: 25%;
     transition: 500ms;
+    transform: scale(1.05);
+    
+}
+.hidden {
+    display: none;
 }
 
 .episode-nb-sn {
