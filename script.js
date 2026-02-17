@@ -1,83 +1,108 @@
-function render(allEpisodes){
-    function renderAll(){
-        allEpisodes.map(element => {
-        document.querySelector(".episodes-display").append(episodeComponent(element));
-    })};
-    
-    renderAll();
+import { getEpisodes, getShows } from "./api.js"
 
-    const inputSearch = document.querySelector("#search-input");
-    inputSearch.addEventListener("keyup", () =>{
-        filterEpisodes(allEpisodes,inputSearch.value);
-    }); 
-
-    const select = document.querySelector("select");
-    const episodesList = allEpisodes.map(element => {
-        const optionClone = document.querySelector(".season-select-option").cloneNode(true);
-        optionClone.innerText = `${element.name}`;
-        select.append(optionClone);
-    });
-
-    select.addEventListener("change", (event) => {
-        const selectedOption = event.target.value;
-        selectedOption!='All Episodes' ? filterEpisodes(allEpisodes,selectedOption) : renderAll();
-    });
-}
-
-function episodeComponent(element){
-    const {name, season, number, summary} = element;
-    const {medium} = element.image;
-    const componentCloned = document.querySelector("template").cloneNode(true);
-    componentCloned.content.querySelector("h5").innerText = `S${season.toString().padStart(2,'0')}E${number.toString().padStart(2,'0')}`;
-    componentCloned.content.querySelector("img").src = medium;
-    componentCloned.content.querySelector("h3").innerText = `${name}`;
-    componentCloned.content.querySelector("p").innerHtml = summary;
-    const newArticle = document.createElement("div");
-    newArticle.classList.add("episode-component");
-    newArticle.append(componentCloned.content);
-    return newArticle;
-}
-
-function filterEpisodes(allEpisodes,input){
-    document.querySelector(".episodes-display").innerHTML = `
-                    <template class="episode-component">
-                    <h5 class="episode-nb-sn">S01E01</h5>
-                    <img class="episode-img" src="http://static.tvmaze.com/uploads/images/medium_landscape/1/2668.jpg" alt="episode-image"/>
-                    <h3 class="episode-title margin">Winter is Coming</h3>
-                    <p class="episode-summary margin">Lord Eddard Stark, ruler of the North, is summoned to court by his old friend, King Robert Baratheon, to serve as the King's Hand. Eddard reluctantly agrees after learning of a possible threat to the King's life. Eddard's bastard son Jon Snow must make a painful decision about his own future, while in the distant east Viserys Targaryen plots to reclaim his father's throne, usurped by Robert, by selling his sister in marriage.</p>
-                    <div class="episode-duration-rate">
-                        <p>62 min</p>
-                        <p>8.91</p>
-                    </div>
-                </template>
-    `;
-    let count =0;
-    allEpisodes.filter(element => {
-        if((element.name.toUpperCase().includes(input.toUpperCase())) || (element.summary.toUpperCase().includes(input.toUpperCase()))){
-            const newcomponent = episodeComponent(element);
-            document.querySelector(".episodes-display").append(newcomponent);
-            count++;
-            document.querySelector(".episode-numbers") .innerText = `Displaying ${count}/73`;
-        }
-    });
-}
-
-async function apiFetch(){
-    const render = document.querySelector(".rendering");
-    const res = await fetch("https://api.tvmaze.com/shows/22/episodes");
-    if(res.ok){
-        const data = await res.json();
-        render.remove()
-        return data;
-    }else{
-        alert("API data couldn't be rendered Error");
-        render.innerText = `API data couldn't be rendered Error ${res.status}`;
-    }
-}
-
-async function main(){
-    const allEpisodes=await apiFetch();
-    render(allEpisodes);
-}
+const showSelect = document.querySelector("#search-show");
+const episodeSelect = document.querySelector("#select-season");
+const inputSearch = document.querySelector("#search-input");
 
 main();
+
+async function main() {
+  const allShows = await getShows();
+  allShows.sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: 'base' }));
+
+  allShows.forEach(show => {
+    const option = document.createElement("option");
+    option.value = show.id;
+    option.innerText = show.name;
+    showSelect.append(option);
+  });
+
+  showSelect.addEventListener("change", async (e) => {
+    const showId = e.target.value;
+    if (showId === "All shows") {
+      render(allShows);
+    } else {
+      const episodes = await getEpisodes(showId);
+      render(episodes);
+    }
+  });
+  render(allShows);
+}
+
+function renderAll(allElements) {
+  const display = document.querySelector(".episodes-display");
+  const template = display.querySelector("template");
+  display.innerHTML = "";
+  display.appendChild(template);
+
+  allElements.forEach(element => {
+    display.append(episodeComponent(element));
+  });
+}
+
+function render(allElements) {
+  renderAll(allElements);
+
+  inputSearch.onkeyup = () => {
+    filterEpisodes(allElements, inputSearch.value);
+  };
+
+  episodeSelect.innerHTML = '<option>All Episodes</option>';
+    allElements.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.name;
+      option.innerText = item.name;  
+      episodeSelect.append(option);
+    });
+  episodeSelect.onchange = (event) => {
+    const selectedOption = event.target.value;
+    selectedOption !== 'All Episodes' ? filterEpisodes(allElements, selectedOption) : renderAll(allElements);
+  };
+}
+
+function episodeComponent(element) {
+  const { name, season, number, summary, rating, runtime, genres, image } = element;
+  const medium = image.medium;
+
+  const template = document.querySelector("template");
+  const clone = template.content.cloneNode(true);
+
+  const header = clone.querySelector(".episode-nb-sn");
+  const title = clone.querySelector(".episode-title");
+  const time = clone.querySelector("#runTime");
+  const rank = clone.querySelector("#rating");
+
+  if (season !== undefined && number !== undefined) {
+    header.innerText = `S${season.toString().padStart(2, '0')}E${number.toString().padStart(2, '0')}`;
+    rank.innerText = `Rating: ${rating.average}`;
+  } else {
+    header.innerText = `Rating: ${rating.average}`;
+    rank.innerText = `Genres: ${genres.join(", ")}`;
+  }
+  time.innerText = `${runtime} min `
+  clone.querySelector("img").src = medium;
+  title.innerText = name;
+  clone.querySelector(".episode-summary").innerHTML = summary;
+
+  const newArticle = document.createElement("div");
+  newArticle.classList.add("episode-component");
+  newArticle.append(clone);
+  return newArticle;
+}
+
+function filterEpisodes(allElements, input) {
+  const display = document.querySelector(".episodes-display");
+  const template = display.querySelector("template");
+  display.innerHTML = "";
+  display.appendChild(template);
+
+  let count = 0;
+  allElements.filter(element => {
+    if ((element.name.toUpperCase().includes(input.toUpperCase())) || (element.summary.toUpperCase().includes(input.toUpperCase()))) {
+      const newComponent = episodeComponent(element);
+      document.querySelector(".episodes-display").append(newComponent);
+      count++;
+      document.querySelector(".episode-numbers") .innerText = `Displaying ${count}/${allElements.length}`;
+    }
+  });
+}
