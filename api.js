@@ -13,13 +13,13 @@ export async function getShows() {
 
   const data = await res.json();
   cache.shows = data;
-  console.log(cache);
   return data;
 }
 
 export async function getEpisodes(showId) {
   const render = document.querySelector(".rendering");
   render.innerText = "Loading episodes...";
+  render.classList.remove("hidden");
   if (cache.episodes[showId]) {
       render.classList.add("hidden"); 
       return cache.episodes[showId];
@@ -28,7 +28,7 @@ export async function getEpisodes(showId) {
   if (res.ok) {
     const data = await res.json();
     cache.episodes[showId] = data;
-    render.remove()
+    render.classList.add("hidden");
     return data;
   }else{
     alert("API data couldn't be rendered Error");
