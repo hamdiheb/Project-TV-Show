@@ -1,7 +1,8 @@
-import { getEpisodes } from "./api.js"
+import { getEpisodes, getShows } from "./api.js"
 
 async function main() {
-  const allEpisodes = await getEpisodes(22);
+  const allShows = await getShows();
+  // const allEpisodes = await getEpisodes(22);
   render(allEpisodes);
 }
 function renderAll(allEpisodes) {

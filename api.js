@@ -5,6 +5,18 @@ const cache = {
   episodes: {}
 };
 
+export async function getShows() {
+  if (cache.shows) return cache.shows;
+
+  const res = await fetch("https://api.tvmaze.com/shows");
+  if (!res.ok) throw new Error("Failed to fetch shows");
+
+  const data = await res.json();
+  cache.shows = data;
+  console.log(cache);
+  return data;
+}
+
 export async function getEpisodes(showId) {
   const render = document.querySelector(".rendering");
   render.innerText = "Loading episodes...";

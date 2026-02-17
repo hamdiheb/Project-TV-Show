@@ -14,7 +14,7 @@ body{
 .search-option {
     background: rgba(248, 253, 248, 0.1);
     padding: 20px;
-    color: white;
+    color: rgb(128, 103, 103);
 }
 
 .episodes-display {
